@@ -62,11 +62,15 @@ async function seedUserIfMissing() {
   const passwordHash = await bcrypt.hash('password', 10);
   await User.create({
     name: 'Alex Student',
+    fullName: 'Alex Student',
+    displayName: 'Alex',
     age: 20,
     email,
     passwordHash,
-    preferences: ['programming', 'basketball'],
+    preferences: ['tech', 'sports'],
     canCreateEvents: false,
+    profilePictureUrl: '',
+    profileComplete: true,
   });
 }
 

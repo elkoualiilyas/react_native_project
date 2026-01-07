@@ -33,12 +33,9 @@ export const AuthController = {
    * @returns {Promise<string | null>}
    */
   async getCurrentUserId() {
-    if (currentUserId) {
-      return currentUserId;
-    }
-    const stored = await AsyncStorage.getItem(AUTH_USER_ID_KEY);
-    currentUserId = stored ?? null;
-    return currentUserId;
+    currentUserId = null;
+    await AsyncStorage.removeItem(AUTH_USER_ID_KEY);
+    return null;
   },
 
   /**

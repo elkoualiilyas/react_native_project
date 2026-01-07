@@ -1,17 +1,30 @@
 // src/views/screens/HomeScreen.js
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useHomeController } from '../../controllers/HomeController';
 import { AuthController } from '../../controllers/AuthController';
 import { useEventCreationRequestController } from '../../controllers/EventCreationRequestController';
 import EventCard from '../components/EventCard';
+import SkeletonEventCard from '../components/SkeletonEventCard';
 
 export default function HomeScreen({ navigation, userId }) {
-  const { user, events, loading, refresh: refreshHome, onEventPress } = useHomeController(userId);
+  const {
+    user,
+    events,
+    loading,
+    refresh: refreshHome,
+    onEventPress,
+    interestedSet,
+    joinedSet,
+    toggleInterested,
+    joinEvent,
+    chatVisited,
+  } = useHomeController(userId);
   const { request, submitting, refresh: refreshRequest, submitRequest } =
     useEventCreationRequestController(userId);
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -23,6 +36,18 @@ export default function HomeScreen({ navigation, userId }) {
   const requestStatusText = request?.status
     ? request.status.charAt(0) + request.status.slice(1).toLowerCase()
     : 'Not requested';
+
+  const showSkeleton = loading && events.length === 0;
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refreshHome();
+      await refreshRequest();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshHome, refreshRequest]);
 
   return (
     <View style={styles.container}>
@@ -76,15 +101,23 @@ export default function HomeScreen({ navigation, userId }) {
         </View>
       ) : null}
 
-      {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" />
-        </View>
+      {showSkeleton ? (
+        <FlatList
+          data={[0, 1, 2, 3, 4, 5]}
+          keyExtractor={(n) => String(n)}
+          contentContainerStyle={styles.listContent}
+          renderItem={() => <SkeletonEventCard />}
+        />
       ) : (
         <FlatList
           data={events}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={events.length === 0 ? styles.emptyContainer : undefined}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          contentContainerStyle={[
+            styles.listContent,
+            events.length === 0 ? styles.emptyContainer : undefined,
+          ]}
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>No matching events</Text>
@@ -94,7 +127,18 @@ export default function HomeScreen({ navigation, userId }) {
             </View>
           }
           renderItem={({ item }) => (
-            <EventCard event={item} onPress={() => onEventPress(item, navigation)} />
+            <EventCard
+              event={item}
+              onPress={() => onEventPress(item, navigation)}
+              interested={interestedSet.has(item.id)}
+              joined={joinedSet.has(item.id)}
+              onToggleInterested={() => toggleInterested(item.id)}
+              onJoin={() => joinEvent(item.id)}
+              onChat={async () => {
+                await chatVisited(item.id);
+                navigation.navigate('GlobalChat', { eventId: item.id });
+              }}
+            />
           )}
         />
       )}
@@ -105,7 +149,7 @@ export default function HomeScreen({ navigation, userId }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F8F9FA',
   },
   header: {
     paddingHorizontal: 16,
@@ -117,70 +161,65 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: '900',
-    color: '#111827',
+    fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#2D3436',
   },
   subtitle: {
     marginTop: 2,
-    color: '#6B7280',
+    color: '#636E72',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
   signOutBtn: {
-    backgroundColor: '#111827',
+    backgroundColor: '#0F4C5C',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
   },
   signOutText: {
-    color: '#fff',
-    fontWeight: '800',
+    color: '#F8F9FA',
+    fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 12,
   },
   actionsCard: {
     marginHorizontal: 16,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(15,76,92,0.10)',
   },
   actionsTitle: {
-    fontWeight: '900',
-    color: '#111827',
+    fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#2D3436',
   },
   actionsSubtitle: {
     marginTop: 4,
-    color: '#6B7280',
+    color: '#636E72',
     fontSize: 12,
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
   primaryBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#00D4AA',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
   },
   primaryBtnText: {
-    color: '#fff',
-    fontWeight: '900',
+    color: '#0F4C5C',
+    fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 12,
   },
   btnPressed: {
     opacity: 0.9,
   },
   btnDisabled: {
-    backgroundColor: '#93C5FD',
+    backgroundColor: 'rgba(0,212,170,0.40)',
   },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  listContent: { paddingBottom: 118, paddingTop: 6 },
   emptyContainer: {
     flexGrow: 1,
   },
@@ -190,13 +229,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 16,
-    color: '#111827',
+    color: '#2D3436',
   },
   emptyText: {
     marginTop: 6,
     textAlign: 'center',
-    color: '#6B7280',
+    color: '#636E72',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
 });

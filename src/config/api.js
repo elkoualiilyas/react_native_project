@@ -14,12 +14,13 @@ export function getApiBaseUrl() {
     return envUrl;
   }
 
+  const port = Number(process.env.EXPO_PUBLIC_API_PORT || 3001);
+
   if (Platform.OS === 'web') {
     const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    return `http://${host}:3001`;
+    return `http://${host}:${port}`;
   }
 
   const host = getHostFromExpo();
-  return `http://${host || 'localhost'}:3001`;
+  return `http://${host || 'localhost'}:${port}`;
 }
-

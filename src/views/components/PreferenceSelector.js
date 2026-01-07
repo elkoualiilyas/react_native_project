@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   pillActive: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB',
+    backgroundColor: '#00D4AA',
+    borderColor: '#00D4AA',
   },
   pillPressed: {
     opacity: 0.9,
@@ -58,9 +58,10 @@ const styles = StyleSheet.create({
   pillText: {
     textTransform: 'capitalize',
     color: '#111827',
-    fontWeight: '600',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
   pillTextActive: {
-    color: '#fff',
+    color: '#0F4C5C',
+    fontFamily: 'SpaceGrotesk_700Bold',
   },
 });

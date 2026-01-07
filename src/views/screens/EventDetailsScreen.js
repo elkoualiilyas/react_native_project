@@ -1,8 +1,9 @@
 // src/views/screens/EventDetailsScreen.js
 
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useEventDetailsController } from '../../controllers/EventDetailsController';
+import { InteractionRepository } from '../../repositories/InteractionRepository';
 import EventMap from '../components/EventMap';
 
 function formatPrice(price) {
@@ -20,8 +21,8 @@ function formatDateTime(dateIso) {
   }
 }
 
-export default function EventDetailsScreen({ route }) {
-  const { eventId } = route.params;
+export default function EventDetailsScreen({ navigation, route }) {
+  const { eventId, userId } = route.params;
   const { event, loading } = useEventDetailsController(eventId);
 
   if (loading || !event) {
@@ -62,6 +63,18 @@ export default function EventDetailsScreen({ route }) {
           lng={event.location.lng}
         />
       </View>
+
+      <Pressable
+        onPress={async () => {
+          if (userId) {
+            await InteractionRepository.chatVisited(userId, event.id);
+          }
+          navigation.navigate('GlobalChat', { eventId: event.id });
+        }}
+        style={({ pressed }) => [styles.chatBtn, pressed && styles.chatBtnPressed]}
+      >
+        <Text style={styles.chatBtnText}>Chat About This</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -132,4 +145,13 @@ const styles = StyleSheet.create({
     height: 260,
     width: '100%',
   },
+  chatBtn: {
+    marginTop: 14,
+    backgroundColor: '#0F4C5C',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  chatBtnPressed: { opacity: 0.9 },
+  chatBtnText: { color: '#F8F9FA', fontWeight: '900', fontSize: 16 },
 });

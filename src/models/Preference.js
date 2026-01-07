@@ -1,15 +1,16 @@
 // src/models/Preference.js
 
 export const PreferenceValues = [
+  'tech',
   'sports',
-  'programming',
-  'drinking',
-  'soccer',
-  'basketball',
+  'music',
+  'culture',
+  'food',
+  'networking',
 ];
 
 /**
- * @typedef {'sports' | 'programming' | 'drinking' | 'soccer' | 'basketball'} Preference
+ * @typedef {'tech' | 'sports' | 'music' | 'culture' | 'food' | 'networking'} Preference
  */
 
 /**

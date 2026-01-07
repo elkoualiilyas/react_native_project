@@ -20,11 +20,15 @@ router.post('/signup', async (req, res) => {
   const passwordHash = await bcrypt.hash(String(password), 10);
   const user = await User.create({
     name: 'New Student',
+    fullName: '',
+    displayName: '',
     age: 18,
     email: normalizedEmail,
     passwordHash,
     preferences: [],
     canCreateEvents: false,
+    profilePictureUrl: '',
+    profileComplete: false,
   });
 
   return res.json({ userId: String(user._id) });
@@ -51,4 +55,3 @@ router.post('/signin', async (req, res) => {
 });
 
 module.exports = router;
-

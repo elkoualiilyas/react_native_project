@@ -11,6 +11,7 @@ const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
 const requestRoutes = require('./routes/requests');
 const adminRoutes = require('./routes/admin');
+const interactionRoutes = require('./routes/interactions');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/interactions', interactionRoutes);
 
 const port = Number(process.env.PORT || 3001);
 const host = process.env.HOST || '0.0.0.0';

@@ -17,13 +17,42 @@ function normalizeEvent(e) {
   };
 }
 
+function mapPreferencesToCategories(preferences) {
+  const out = new Set();
+  for (const p of preferences) {
+    const pref = String(p || '').trim().toLowerCase();
+    if (!pref) continue;
+    if (['programming', 'drinking', 'soccer', 'basketball'].includes(pref)) {
+      out.add(pref);
+      continue;
+    }
+    if (pref === 'tech') {
+      out.add('programming');
+      continue;
+    }
+    if (pref === 'sports') {
+      out.add('sports');
+      out.add('soccer');
+      out.add('basketball');
+      continue;
+    }
+    if (pref === 'networking') {
+      out.add('programming');
+      out.add('sports');
+      continue;
+    }
+  }
+  return Array.from(out);
+}
+
 router.get('/', async (req, res) => {
   const preferencesParam = req.query.preferences;
   const preferences = typeof preferencesParam === 'string' && preferencesParam.length > 0
     ? preferencesParam.split(',').map((p) => p.trim()).filter(Boolean)
     : [];
 
-  const filter = preferences.length > 0 ? { category: { $in: preferences } } : {};
+  const categories = mapPreferencesToCategories(preferences);
+  const filter = categories.length > 0 ? { category: { $in: categories } } : {};
   const events = await Event.find(filter).sort({ date: 1 }).lean();
   return res.json(events.map(normalizeEvent));
 });
@@ -65,4 +94,3 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
-
