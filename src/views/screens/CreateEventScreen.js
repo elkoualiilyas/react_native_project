@@ -18,7 +18,7 @@ export default function CreateEventScreen({ navigation, route }) {
   const { userId } = route.params;
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('programming');
+  const [category, setCategory] = useState('tech');
   const [price, setPrice] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [date, setDate] = useState(new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString());
@@ -228,4 +228,3 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
 });
-

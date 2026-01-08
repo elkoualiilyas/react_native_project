@@ -24,7 +24,7 @@ import AdminEventsScreen from '../views/screens/AdminEventsScreen';
 import AdminRequestsScreen from '../views/screens/AdminRequestsScreen';
 import TabBarBackground from '../views/components/TabBarBackground';
 
-import Feather from 'react-native-vector-icons/Feather';
+import { Feather } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -166,9 +166,7 @@ function AuthStack() {
     <Stack.Navigator>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
-      {Platform.OS === 'web' ? (
-        <Stack.Screen name="AdminLogin" component={AdminLoginScreen} options={{ title: 'Admin Login' }} />
-      ) : null}
+      <Stack.Screen name="AdminLogin" component={AdminLoginScreen} options={{ title: 'Admin Login' }} />
     </Stack.Navigator>
   );
 }
@@ -187,7 +185,7 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {Platform.OS === 'web' && adminToken ? (
+      {adminToken ? (
         <AdminStack token={adminToken} />
       ) : userId ? (
         <AppStack userId={userId} />

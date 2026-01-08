@@ -10,7 +10,7 @@ async function seedEventsIfEmpty() {
   await Event.insertMany([
     {
       title: 'Campus Hack Night',
-      category: 'programming',
+      category: 'tech',
       price: 0,
       organizer: 'CS Club',
       date: new Date(now + 1000 * 60 * 60 * 24),
@@ -19,7 +19,7 @@ async function seedEventsIfEmpty() {
     },
     {
       title: 'Intramural Soccer Tryouts',
-      category: 'soccer',
+      category: 'sports',
       organizer: 'Sports Office',
       date: new Date(now + 1000 * 60 * 60 * 48),
       description: 'Open tryouts for intramural teams. All levels welcome.',
@@ -27,7 +27,7 @@ async function seedEventsIfEmpty() {
     },
     {
       title: 'Basketball Pickup Games',
-      category: 'basketball',
+      category: 'sports',
       price: 5,
       organizer: 'Rec Center',
       date: new Date(now + 1000 * 60 * 60 * 72),
@@ -44,7 +44,7 @@ async function seedEventsIfEmpty() {
     },
     {
       title: 'Social Night (21+)',
-      category: 'drinking',
+      category: 'networking',
       price: 15,
       organizer: 'Student Council',
       date: new Date(now + 1000 * 60 * 60 * 120),

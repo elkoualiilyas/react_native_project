@@ -67,11 +67,9 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.linkText}>Create an account</Text>
         </Pressable>
 
-        {Platform.OS === 'web' ? (
-          <Pressable onPress={() => navigation.navigate('AdminLogin')} style={styles.adminBtn}>
-            <Text style={styles.adminText}>Admin dashboard</Text>
-          </Pressable>
-        ) : null}
+        <Pressable onPress={() => navigation.navigate('AdminLogin')} style={styles.adminBtn}>
+          <Text style={styles.adminText}>Admin dashboard</Text>
+        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );

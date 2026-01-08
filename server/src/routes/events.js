@@ -22,11 +22,16 @@ function mapPreferencesToCategories(preferences) {
   for (const p of preferences) {
     const pref = String(p || '').trim().toLowerCase();
     if (!pref) continue;
+    if (['tech', 'sports', 'music', 'culture', 'food', 'networking'].includes(pref)) {
+      out.add(pref);
+      continue;
+    }
     if (['programming', 'drinking', 'soccer', 'basketball'].includes(pref)) {
       out.add(pref);
       continue;
     }
     if (pref === 'tech') {
+      out.add('tech');
       out.add('programming');
       continue;
     }
@@ -37,6 +42,7 @@ function mapPreferencesToCategories(preferences) {
       continue;
     }
     if (pref === 'networking') {
+      out.add('networking');
       out.add('programming');
       out.add('sports');
       continue;

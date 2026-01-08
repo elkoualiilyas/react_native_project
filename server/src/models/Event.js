@@ -1,6 +1,17 @@
 const mongoose = require('mongoose');
 
-const categoryEnum = ['sports', 'programming', 'drinking', 'soccer', 'basketball'];
+const categoryEnum = [
+  'tech',
+  'sports',
+  'music',
+  'culture',
+  'food',
+  'networking',
+  'programming',
+  'drinking',
+  'soccer',
+  'basketball',
+];
 
 const EventSchema = new mongoose.Schema(
   {
@@ -21,4 +32,3 @@ const EventSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('Event', EventSchema);
-

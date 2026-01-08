@@ -17,7 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 
-import Feather from 'react-native-vector-icons/Feather';
+import { Feather } from '@expo/vector-icons';
 import { addDoc, collection, doc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 
 import { getFirestoreDb } from '../../config/firebase';
