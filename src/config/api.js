@@ -29,6 +29,7 @@ function getHostFromExpo() {
     Constants.manifest?.debuggerHost,
     Constants.linkingUri,
     Constants.experienceUrl,
+    Constants.debuggerHost,
   ];
 
   for (const c of candidates) {
@@ -39,11 +40,22 @@ function getHostFromExpo() {
   return null;
 }
 
+function getExplicitApiBaseUrl() {
+  const v =
+    Constants.expoConfig?.extra?.apiBaseUrl ||
+    Constants.manifest2?.extra?.expoClient?.extra?.apiBaseUrl ||
+    Constants.manifest?.extra?.apiBaseUrl;
+  return typeof v === 'string' && v.trim().length > 0 ? v.trim() : null;
+}
+
 export function getApiBaseUrl() {
   const envUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
   if (typeof envUrl === 'string' && envUrl.length > 0) {
     return envUrl;
   }
+
+  const explicitUrl = getExplicitApiBaseUrl();
+  if (explicitUrl) return explicitUrl;
 
   const port = Number(process.env.EXPO_PUBLIC_API_PORT || 3002);
 

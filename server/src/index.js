@@ -27,7 +27,7 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/interactions', interactionRoutes);
 
-const port = Number(process.env.PORT || 3001);
+const port = Number(process.env.PORT || 3002);
 const host = process.env.HOST || '0.0.0.0';
 
 async function start() {

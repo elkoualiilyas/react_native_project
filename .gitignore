@@ -39,5 +39,5 @@ yarn-error.*
 # generated native folders
 /ios
 /android
-#Sensitive files
+# Sensitive files
 src/config/firebase.js

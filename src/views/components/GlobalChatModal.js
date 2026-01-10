@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   Platform,
@@ -57,6 +57,7 @@ export default function GlobalChatModal({ visible, onClose, userId, initialEvent
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [inputText, setInputText] = useState('');
 
   useEffect(() => {
     if (!visible) return;
@@ -224,6 +225,7 @@ export default function GlobalChatModal({ visible, onClose, userId, initialEvent
       readBy: [String(userId)],
     };
     await addDoc(collection(firestore, 'global_chat'), payload);
+    setInputText('');
   }
 
   async function pickPhoto(onPick) {
@@ -259,6 +261,80 @@ export default function GlobalChatModal({ visible, onClose, userId, initialEvent
   }, [onlineUsers, userId]);
 
   const emojiRow = useMemo(() => ['😀', '😂', '😍', '🔥', '🎉', '👍', '🙏', '😎', '🥳', '❤️', '💬', '🚀'], []);
+
+  const textInputProps = useMemo(
+    () => ({
+      onChangeText: setInputText,
+      placeholderTextColor: '#636E72',
+      style: styles.composerInput,
+    }),
+    []
+  );
+
+  const onAppendEmoji = useCallback((em) => {
+    setInputText((t) => `${t || ''}${em}`);
+  }, []);
+
+  const renderInputToolbar = useCallback(
+    (props) => {
+      return (
+        <View>
+          {emojiOpen ? (
+            <View style={styles.emojiBar}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.emojiRow}>
+                {emojiRow.map((em) => (
+                  <Pressable
+                    key={em}
+                    onPress={() => onAppendEmoji(em)}
+                    style={({ pressed }) => [styles.emojiBtn, pressed && styles.pillPressed]}
+                  >
+                    <Text style={styles.emoji}>{em}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          ) : null}
+          <InputToolbar
+            {...props}
+            containerStyle={styles.inputToolbar}
+            primaryStyle={{ alignItems: 'center' }}
+          />
+        </View>
+      );
+    },
+    [emojiOpen, emojiRow, onAppendEmoji]
+  );
+
+  const renderActions = useCallback(() => {
+    return (
+      <View style={styles.actions}>
+        <Pressable
+          onPress={() => setEmojiOpen((v) => !v)}
+          style={({ pressed }) => [styles.actionBtn, pressed && styles.pillPressed]}
+        >
+          <Feather name="smile" size={18} color="#0F4C5C" />
+        </Pressable>
+        <Pressable
+          onPress={() =>
+            pickPhoto((dataUrl) => {
+              onSend([
+                {
+                  _id: `${Date.now()}`,
+                  createdAt: new Date(),
+                  user: { _id: String(userId), name: userName },
+                  text: '',
+                  image: dataUrl,
+                },
+              ]);
+            })
+          }
+          style={({ pressed }) => [styles.actionBtn, pressed && styles.pillPressed]}
+        >
+          <Feather name="image" size={18} color="#0F4C5C" />
+        </Pressable>
+      </View>
+    );
+  }, [onSend, pickPhoto, userId, userName]);
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={close}>
@@ -331,65 +407,10 @@ export default function GlobalChatModal({ visible, onClose, userId, initialEvent
             onSend={onSend}
             user={{ _id: String(userId), name: userName }}
             alwaysShowSend
-            textInputProps={{
-              placeholderTextColor: '#636E72',
-              style: styles.composerInput,
-            }}
-            renderInputToolbar={(props) => (
-              <View>
-                {emojiOpen ? (
-                  <View style={styles.emojiBar}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.emojiRow}>
-                      {emojiRow.map((em) => (
-                        <Pressable
-                          key={em}
-                          onPress={() => {
-                            const text = (props.text || '') + em;
-                            props.onTextChanged(text);
-                          }}
-                          style={({ pressed }) => [styles.emojiBtn, pressed && styles.pillPressed]}
-                        >
-                          <Text style={styles.emoji}>{em}</Text>
-                        </Pressable>
-                      ))}
-                    </ScrollView>
-                  </View>
-                ) : null}
-                <InputToolbar
-                  {...props}
-                  containerStyle={styles.inputToolbar}
-                  primaryStyle={{ alignItems: 'center' }}
-                />
-              </View>
-            )}
-            renderActions={() => (
-              <View style={styles.actions}>
-                <Pressable
-                  onPress={() => setEmojiOpen((v) => !v)}
-                  style={({ pressed }) => [styles.actionBtn, pressed && styles.pillPressed]}
-                >
-                  <Feather name="smile" size={18} color="#0F4C5C" />
-                </Pressable>
-                <Pressable
-                  onPress={() =>
-                    pickPhoto((dataUrl) => {
-                      onSend([
-                        {
-                          _id: `${Date.now()}`,
-                          createdAt: new Date(),
-                          user: { _id: String(userId), name: userName },
-                          text: '',
-                          image: dataUrl,
-                        },
-                      ]);
-                    })
-                  }
-                  style={({ pressed }) => [styles.actionBtn, pressed && styles.pillPressed]}
-                >
-                  <Feather name="image" size={18} color="#0F4C5C" />
-                </Pressable>
-              </View>
-            )}
+            text={inputText}
+            textInputProps={textInputProps}
+            renderInputToolbar={renderInputToolbar}
+            renderActions={renderActions}
             renderTicks={(msg) => {
               const readBy = Array.isArray(msg?.currentMessage?.readBy) ? msg.currentMessage.readBy : [];
               const unique = new Set(readBy.map(String));
